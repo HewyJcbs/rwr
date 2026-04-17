@@ -1,35 +1,35 @@
-[gd_scene load_steps=4 format=3 uid="uid://bokactdwmmmvf"]
+[gd_scene format=3 uid="uid://bokactdwmmmvf"]
 
-[ext_resource type="Script" path="res://main.gd" id="1_m6qud"]
+[ext_resource type="Script" uid="uid://du3k286m86ojg" path="res://main.gd" id="1_m6qud"]
+[ext_resource type="PackedScene" uid="uid://bk64th7vgxn3b" path="res://assets/models/l_hand.glb" id="2_h2yge"]
+[ext_resource type="PackedScene" uid="uid://dhgb5ikeqacgq" path="res://assets/models/r_hand.glb" id="3_1bvp3"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_88d50"]
-size = Vector3(0.1, 0.1, 0.1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_yon72"]
-size = Vector3(0.1, 0.1, 0.1)
-
-[node name="Main" type="Node3D"]
+[node name="Main" type="Node3D" unique_id=403531780]
 script = ExtResource("1_m6qud")
 
-[node name="XROrigin3D" type="XROrigin3D" parent="."]
+[node name="XROrigin3D" type="XROrigin3D" parent="." unique_id=1553246279]
 
-[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
+[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D" unique_id=1855218853]
 
-[node name="LeftController" type="XRController3D" parent="XROrigin3D"]
+[node name="LeftController" type="XRController3D" parent="XROrigin3D" unique_id=346266369]
 tracker = &"left_hand"
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/LeftController"]
-mesh = SubResource("BoxMesh_88d50")
+[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/LeftController" unique_id=1091459676]
 
-[node name="RightController" type="XRController3D" parent="XROrigin3D"]
+[node name="l_hand" parent="XROrigin3D/LeftController/MeshInstance3D" unique_id=1807283534 instance=ExtResource("2_h2yge")]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+
+[node name="RightController" type="XRController3D" parent="XROrigin3D" unique_id=1339351015]
 tracker = &"right_hand"
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/RightController"]
-mesh = SubResource("BoxMesh_yon72")
+[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/RightController" unique_id=459653274]
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="r_hand" parent="XROrigin3D/RightController/MeshInstance3D" unique_id=1858165651 instance=ExtResource("3_1bvp3")]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 
-[node name="Button" type="Button" parent="CanvasLayer"]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=534643607]
+
+[node name="Button" type="Button" parent="CanvasLayer" unique_id=1577758620]
 offset_right = 8.0
 offset_bottom = 8.0
 text = "Enter VR"
