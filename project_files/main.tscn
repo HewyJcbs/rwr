@@ -3,6 +3,12 @@
 [ext_resource type="Script" uid="uid://du3k286m86ojg" path="res://main.gd" id="1_m6qud"]
 [ext_resource type="PackedScene" uid="uid://bk64th7vgxn3b" path="res://assets/models/l_hand.glb" id="2_h2yge"]
 [ext_resource type="PackedScene" uid="uid://dhgb5ikeqacgq" path="res://assets/models/r_hand.glb" id="3_1bvp3"]
+[ext_resource type="Script" uid="uid://ymgcuwm5xrmr" path="res://teleport.gd" id="3_lquwl"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1bvp3"]
+top_radius = 0.25
+bottom_radius = 0.25
+height = 0.25
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_h2yge"]
 size = Vector2(20, 20)
@@ -51,11 +57,19 @@ transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0
 
 [node name="RightController" type="XRController3D" parent="XROrigin3D" unique_id=1339351015]
 tracker = &"right_hand"
+script = ExtResource("3_lquwl")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/RightController" unique_id=459653274]
 
 [node name="r_hand" parent="XROrigin3D/RightController/MeshInstance3D" unique_id=1858165651 instance=ExtResource("3_1bvp3")]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+
+[node name="TeleportRay" type="RayCast3D" parent="XROrigin3D/RightController" unique_id=1964618715]
+target_position = Vector3(0, 0, -10)
+
+[node name="TeleportMarker" type="MeshInstance3D" parent="XROrigin3D/RightController/TeleportRay" unique_id=532547765]
+visible = false
+mesh = SubResource("CylinderMesh_1bvp3")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=534643607]
 
