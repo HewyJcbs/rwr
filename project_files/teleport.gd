@@ -9,6 +9,8 @@ func _ready() -> void:
     xr_origin = get_parent() as XROrigin3D
     xr_camera = xr_origin.get_node("XRCamera3D") as XRCamera3D
     marker.visible = false
+    
+    button_released.connect(_on_button_released)
 
 func _process(_delta: float) -> void:
     if ray.is_colliding():
@@ -16,6 +18,10 @@ func _process(_delta: float) -> void:
         marker.visible = true
     else:
         marker.visible = false
+
+func _on_button_released(button_name: String) -> void:
+    if button_name == "trigger_click" or button_name == "ax_button" or button_name == "primary_click":
+        teleport_now()
 
 func teleport_now() -> void:
     if not ray.is_colliding():
@@ -27,12 +33,11 @@ func teleport_now() -> void:
     var cam_tf := xr_camera.global_transform
     var cam_offset := cam_tf.origin - origin_tf.origin
 
-    # Stabilizacja wysokości
     cam_offset.y = 0.0
 
     origin_tf.origin = Vector3(
         target.x - cam_offset.x,
-        target.y,  # lub 0.0 jeśli podłoże jest płaskie
+        target.y,
         target.z - cam_offset.z
     )
 
