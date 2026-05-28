@@ -1,44 +1,23 @@
-extends XRController3D
+extends XROrigin3D
 
-@onready var ray: RayCast3D = $TeleportRay
-@onready var marker: MeshInstance3D = $TeleportMarker
-var xr_origin: XROrigin3D
-var xr_camera: XRCamera3D
+@export var move_speed: float = 2.5
+@export var deadzone: float = 0.15
 
-func _ready() -> void:
-    xr_origin = get_parent() as XROrigin3D
-    xr_camera = xr_origin.get_node("XRCamera3D") as XRCamera3D
-    marker.visible = false
-    
-    button_released.connect(_on_button_released)
+@onready var xr_camera: XRCamera3D = $XRCamera3D
+@onready var left_ctrl: XRController3D = $LeftController
 
-func _process(_delta: float) -> void:
-    if ray.is_colliding():
-        marker.global_transform.origin = ray.get_collision_point()
-        marker.visible = true
-    else:
-        marker.visible = false
+func _physics_process(delta: float) -> void:
+	var dir := Vector3.ZERO
+	var fwd := -xr_camera.global_transform.basis.z; fwd.y = 0.0; fwd = fwd.normalized()
+	var right := xr_camera.global_transform.basis.x; right.y = 0.0; right = right.normalized()
 
-func _on_button_released(button_name: String) -> void:
-    if button_name == "trigger_click" or button_name == "ax_button" or button_name == "primary_click":
-        teleport_now()
+	var v: Vector2 = left_ctrl.get_vector2("thumbstick")
+	var strength = v.length()
+	
+	if v.length() < deadzone:
+		v = Vector2.ZERO
 
-func teleport_now() -> void:
-    if not ray.is_colliding():
-        return
-
-    var target: Vector3 = ray.get_collision_point()
-
-    var origin_tf := xr_origin.global_transform
-    var cam_tf := xr_camera.global_transform
-    var cam_offset := cam_tf.origin - origin_tf.origin
-
-    cam_offset.y = 0.0
-
-    origin_tf.origin = Vector3(
-        target.x - cam_offset.x,
-        target.y,
-        target.z - cam_offset.z
-    )
-
-    xr_origin.global_transform = origin_tf
+	dir += fwd * (v.y) + right * (v.x)
+	
+	if dir.length() > 0.0:
+		global_translate(dir.normalized() * move_speed * delta)
