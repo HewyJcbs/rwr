@@ -1,23 +1,65 @@
-extends XROrigin3D
+extends XRController3D
 
-@export var move_speed: float = 2.5
-@export var deadzone: float = 0.15
+@onready var ray: RayCast3D = $TeleportRay
+@onready var marker: MeshInstance3D = $TeleportMarker
 
-@onready var xr_camera: XRCamera3D = $XRCamera3D
-@onready var left_ctrl: XRController3D = $LeftController
+@export var snap_turn_angle: float = 45.0
+@export var turn_deadzone: float = 0.5
+var can_snap_turn: bool = true
 
-func _physics_process(delta: float) -> void:
-	var dir := Vector3.ZERO
-	var fwd := -xr_camera.global_transform.basis.z; fwd.y = 0.0; fwd = fwd.normalized()
-	var right := xr_camera.global_transform.basis.x; right.y = 0.0; right = right.normalized()
+var xr_origin: XROrigin3D
+var xr_camera: XRCamera3D
 
-	var v: Vector2 = left_ctrl.get_vector2("thumbstick")
-	var strength = v.length()
-	
-	if v.length() < deadzone:
-		v = Vector2.ZERO
+func _ready() -> void:
+    xr_origin = get_parent() as XROrigin3D
+    xr_camera = xr_origin.get_node("XRCamera3D") as XRCamera3D
+    marker.visible = false
+    self.button_pressed.connect(self._on_button_pressed)
 
-	dir += fwd * (v.y) + right * (v.x)
-	
-	if dir.length() > 0.0:
-		global_translate(dir.normalized() * move_speed * delta)
+func _process(_delta: float) -> void:
+    if ray.is_colliding():
+        marker.global_transform.origin = ray.get_collision_point()
+        marker.visible = true
+    else:
+        marker.visible = false
+        
+    handle_snap_turn()
+
+func handle_snap_turn() -> void:
+    var joy: Vector2 = get_vector2("thumbstick")
+
+    if abs(joy.x) < turn_deadzone:
+        can_snap_turn = true
+        return
+
+    if can_snap_turn:
+        var pos_before = xr_camera.global_position
+
+        if joy.x > 0:
+            xr_origin.rotate_y(deg_to_rad(-snap_turn_angle))
+        else:
+            xr_origin.rotate_y(deg_to_rad(snap_turn_angle))
+
+        var pos_after = xr_camera.global_position
+        var delta_pos = pos_before - pos_after
+        xr_origin.global_position += delta_pos
+
+        can_snap_turn = false
+
+func teleport_now() -> void:
+    if not ray.is_colliding():
+        return
+    var target: Vector3 = ray.get_collision_point()
+
+    var origin_tf := xr_origin.global_transform
+    var cam_tf := xr_camera.global_transform
+    var cam_offset := cam_tf.origin - origin_tf.origin
+    cam_offset.y = 0.0
+    origin_tf.origin = Vector3(target.x - cam_offset.x, target.y, target.z - cam_offset.z)
+    xr_origin.global_transform = origin_tf
+
+func _on_button_pressed(button_name: String) -> void:
+    print("Wciśnięto przycisk: ", button_name) 
+    if button_name == "trigger_click":
+        print("RayCast uderza w: ", ray.is_colliding()) 
+        teleport_now()
