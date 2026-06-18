@@ -1,2 +1,2 @@
-Media wszechogarniające i wirtualna rzeczywistość - Labolatoria
+Media wszechogarniające i wirtualna rzeczywistość - Laboratoria
 Politechnika Poznańska 2026
